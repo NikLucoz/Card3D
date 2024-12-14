@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://usdfp6fqxnev"]
+[gd_scene load_steps=14 format=3 uid="uid://usdfp6fqxnev"]
 
 [ext_resource type="Script" path="res://example/table.gd" id="1_trlmi"]
 [ext_resource type="Script" path="res://addons/card_3d/scripts/drag_controller.gd" id="2_07uyt"]
@@ -6,6 +6,8 @@
 [ext_resource type="Script" path="res://addons/card_3d/scripts/card_layouts/line_card_layout.gd" id="4_t7f8m"]
 [ext_resource type="Script" path="res://addons/card_3d/scripts/card_layouts/fan_card_layout.gd" id="5_rd2gk"]
 [ext_resource type="PackedScene" uid="uid://bjx4ugu14qx3w" path="res://example/face_card_3d.tscn" id="6_qtugc"]
+[ext_resource type="Script" path="res://addons/card_3d/scripts/control.gd" id="7_vf25j"]
+[ext_resource type="Texture2D" uid="uid://cjn4hu85dveg5" path="res://example/assets/card_clubs_02.png" id="8_5j2ls"]
 
 [sub_resource type="Resource" id="Resource_yq80r"]
 script = ExtResource("4_t7f8m")
@@ -63,4 +65,54 @@ suit = 3
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.111376)
 mesh = SubResource("BoxMesh_g1lkx")
 
+[node name="InspectCardPanel" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+script = ExtResource("7_vf25j")
+
+[node name="BGPanel" type="Panel" parent="InspectCardPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+
+[node name="CardTextureRect" type="TextureRect" parent="InspectCardPanel"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -151.0
+offset_top = -197.0
+offset_right = 129.0
+offset_bottom = 183.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("8_5j2ls")
+
+[node name="Label" type="Label" parent="InspectCardPanel"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -96.0
+offset_top = -23.0
+offset_right = 96.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "Press Shift again to close"
+
+[connection signal="card_inspected" from="Table/DragController/TableCards" to="InspectCardPanel" method="_on_card_inspected"]
+[connection signal="card_inspected" from="Table/DragController/Hand" to="InspectCardPanel" method="_on_card_inspected"]
 [connection signal="card_3d_mouse_up" from="Deck" to="Table" method="_on_face_card_3d_card_3d_mouse_up"]

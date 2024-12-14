@@ -11,6 +11,8 @@ Usage:
 class_name Card3D
 extends Node3D
 
+@onready var card_back_mesh: MeshInstance3D = $CardMesh/CardBackMesh
+@onready var card_front_mesh: MeshInstance3D = $CardMesh/CardFrontMesh
 
 @export var hover_scale_factor: float = 1.15
 @export var hover_pos_move: Vector3 = Vector3(0, 0.7, 0)
@@ -28,11 +30,14 @@ signal card_3d_mouse_down()
 signal card_3d_mouse_up()
 signal card_3d_mouse_over()
 signal card_3d_mouse_exit()
-
+signal card_3d_mouse_interacted()
+signal card_3d_inspected(status: bool)
 
 var position_tween: Tween
 var rotate_tween: Tween
 var hover_tween: Tween
+var mouse_hovering: bool
+var card_in_ispection: bool = false
 
 
 func disable_collision():
@@ -104,12 +109,13 @@ func _tween_card_rotation(target_rotation, duration):
 
 
 func _on_static_body_3d_mouse_entered():
+	mouse_hovering = true
 	card_3d_mouse_over.emit()
 
 
 func _on_static_body_3d_mouse_exited():
+	mouse_hovering = false
 	card_3d_mouse_exit.emit()
-
 
 func _on_static_body_3d_input_event(_camera, event, _event_position, _normal, _shape_idx):
 	if event is InputEventMouseButton:
@@ -119,3 +125,14 @@ func _on_static_body_3d_input_event(_camera, event, _event_position, _normal, _s
 			card_3d_mouse_down.emit()
 		elif button == 1 and pressed == false:
 			card_3d_mouse_up.emit()
+		if button == 2 and pressed:
+			card_3d_mouse_interacted.emit()
+
+func _input(event: InputEvent) -> void:
+	if event is InputEventKey:
+		if event.is_pressed() and event.keycode == KEY_SHIFT and mouse_hovering and !card_in_ispection:
+			card_3d_inspected.emit(true)
+			card_in_ispection = true
+		elif event.is_released() or !mouse_hovering and card_in_ispection:
+			card_3d_inspected.emit(false)
+			card_in_ispection = false

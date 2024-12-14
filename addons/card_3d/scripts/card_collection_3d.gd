@@ -21,6 +21,8 @@ signal mouse_exit_drop_zone()
 signal card_selected(card)
 signal card_clicked(card)
 signal card_added(card)
+signal card_interacted(card)
+signal card_inspected(status: bool, card)
 
 
 @onready var dropzone_collision: CollisionShape3D = $DropZone/CollisionShape3D
@@ -64,7 +66,9 @@ func insert_card(card: Card3D, index: int):
 	card.card_3d_mouse_up.connect(_on_card_clicked.bind(card))
 	card.card_3d_mouse_over.connect(_on_card_hover.bind(card))
 	card.card_3d_mouse_exit.connect(_on_card_exit.bind(card))
-		
+	card.card_3d_mouse_interacted.connect(_on_card_interacted.bind(card))
+	card.card_3d_inspected.connect(_on_card_inspected.bind(card))
+	
 	cards.insert(index, card)
 	add_child(card)
 	
@@ -103,7 +107,9 @@ func remove_card(index: int) -> Card3D:
 	removed_card.card_3d_mouse_up.disconnect(_on_card_clicked.bind(removed_card))
 	removed_card.card_3d_mouse_over.disconnect(_on_card_hover.bind(removed_card))
 	removed_card.card_3d_mouse_exit.disconnect(_on_card_exit.bind(removed_card))
-
+	removed_card.card_3d_mouse_interacted.disconnect(_on_card_interacted.bind(removed_card))
+	removed_card.card_3d_inspected.disconnect(_on_card_inspected.bind(removed_card))
+	
 	return removed_card
 
 
@@ -121,7 +127,6 @@ func remove_all() -> Array[Card3D]:
 
 func apply_card_layout():
 	card_layout_strategy.update_card_positions(cards, card_move_tween_duration)
-
 
 func preview_card_remove(dragging_card: Card3D):
 	if card_indicies.has(dragging_card):
@@ -211,6 +216,11 @@ func _on_card_pressed(card: Card3D):
 func _on_card_clicked(card: Card3D):
 	card_clicked.emit(card)
 
+func _on_card_interacted(card: Card3D):
+	card_interacted.emit(card)
+
+func _on_card_inspected(status: bool, card: Card3D):
+	card_inspected.emit(status, card)
 
 func _on_drop_zone_mouse_entered():
 	mouse_enter_drop_zone.emit()
